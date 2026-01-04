@@ -1,0 +1,9 @@
+pandas
+numpy
+requests
+xgboost
+scikit-learn
+matplotlib
+google-generativeai
+python-dotenv
+mlflow

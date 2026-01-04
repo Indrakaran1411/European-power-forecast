@@ -1,0 +1,18 @@
+# --- Python Basics ---
+__pycache__/
+*.py[cod]
+*.so
+
+# --- Virtual Environment ---
+env/
+venv/
+.env
+
+# --- Project Data (Too large/sensitive) ---
+# We ignore the raw CSVs, but keep your specific forecast results if you want
+data/*.csv
+!data/forecast_results.csv 
+
+# --- MLflow & Logs (Local history - KEEP THESE IGNORED) ---
+mlruns/
+mlflow.db

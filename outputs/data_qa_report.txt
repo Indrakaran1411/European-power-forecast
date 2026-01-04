@@ -1,0 +1,6 @@
+DATA QA REPORT for data/submission_data.csv
+========================================
+1. Missing Values: ✅ PASS
+2. Duplicates:     ✅ PASS
+3. Negative Load:  ✅ PASS
+4. Completeness:   ✅ PASS

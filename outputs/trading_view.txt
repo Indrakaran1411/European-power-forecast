@@ -1,0 +1,7 @@
+TRADING SIGNAL REPORT
+==============================
+Signal: LONG (BUY) 🟢
+Reason: Prices are forecast to be 10% below average.
+Next 24h Avg Price: €27.38
+Market Avg Price:   €94.92
+==============================
