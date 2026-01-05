@@ -1,0 +1,7 @@
+ You are a Senior Power Trader. Write a 3-sentence executive summary about the Dutch Power Market based on this AI Forecast model:
+    - Average Forecast Price: {avg_price:.2f} EUR
+    - Max Price: {max_price:.2f} EUR
+    - Min Price: {min_price:.2f} EUR
+    - Model MAE Error: {mae_approx:.2f} EUR
+    
+    Explain if the market is volatile and if the model is trustworthy based on the MAE.
