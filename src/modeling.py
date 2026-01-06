@@ -28,7 +28,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 # =========================
 INPUT_FILE = "data/submission_data.csv"
 OUTPUT_FILE = "data/forecast_results.csv"
-MLFLOW_EXP_NAME = "Power_Price_Forecast_NL_1"
+MLFLOW_EXP_NAME = "Power_Price_Forecast_NL_Final"
 
 # =========================
 # 2. FEATURE ENGINEERING
@@ -110,18 +110,29 @@ def run_experiments():
 
     # Track Best Model
     best_mae = float('inf')
+    best_rmse = float('inf')
+    best_r2 = -float('inf')
     best_model_name = "None"
     best_preds = None
 
-    # --- 1. BASELINE ---
-    print("\n--- 1. Baseline (Seasonal Naive) ---")
-    base_preds = X_test['Price_Lag_168']
-    mae, rmse, r2 = evaluate_model(y_test, base_preds, "Baseline")
-    
-    if mae < best_mae:
-        best_mae = mae
-        best_model_name = "Baseline"
-        best_preds = base_preds
+    # --- 1. BASELINE (Now logged to MLflow!) ---
+    with mlflow.start_run(run_name="Baseline"):
+        print("\n--- 1. Baseline (Seasonal Naive) ---")
+        base_preds = X_test['Price_Lag_168']
+        mae, rmse, r2 = evaluate_model(y_test, base_preds, "Baseline")
+        
+        # Log metrics so they appear in the UI comparison
+        mlflow.log_metric("mae", mae)
+        mlflow.log_metric("rmse", rmse)
+        mlflow.log_metric("r2", r2)
+        mlflow.log_param("model_type", "Naive_Lag_168")
+        
+        if mae < best_mae:
+            best_mae = mae
+            best_rmse = rmse
+            best_r2 = r2
+            best_model_name = "Baseline"
+            best_preds = base_preds
 
     # --- 2. RIDGE REGRESSION ---
     with mlflow.start_run(run_name="Ridge_Regression"):
@@ -135,9 +146,12 @@ def run_experiments():
         mlflow.log_metric("mae", mae)
         mlflow.log_metric("rmse", rmse)
         mlflow.log_metric("r2", r2)
+        mlflow.log_param("model_type", "Linear_Ridge")
         
         if mae < best_mae:
             best_mae = mae
+            best_rmse = rmse
+            best_r2 = r2
             best_model_name = "Ridge_Regression"
             best_preds = preds
 
@@ -146,7 +160,7 @@ def run_experiments():
         print("\n--- 3. XGBoost (RandomizedSearchCV) ---")
         xgb_model = xgb.XGBRegressor(n_jobs=-1, random_state=42)
         tscv = TimeSeriesSplit(n_splits=3)
-        # Fast Grid Search
+        
         param_dist = {'n_estimators': [500], 'learning_rate': [0.05], 'max_depth': [5]} 
         
         search = RandomizedSearchCV(xgb_model, param_dist, n_iter=1, cv=tscv, scoring='neg_mean_absolute_error')
@@ -158,9 +172,13 @@ def run_experiments():
         mlflow.log_metric("mae", mae)
         mlflow.log_metric("rmse", rmse)
         mlflow.log_metric("r2", r2)
+        mlflow.log_params(search.best_params_)
+        mlflow.log_param("model_type", "Tree_Ensemble")
 
         if mae < best_mae:
             best_mae = mae
+            best_rmse = rmse
+            best_r2 = r2
             best_model_name = "XGBoost"
             best_preds = preds
 
@@ -179,16 +197,23 @@ def run_experiments():
         mlflow.log_metric("mae", mae)
         mlflow.log_metric("rmse", rmse)
         mlflow.log_metric("r2", r2)
+        mlflow.log_param("model_type", "Hybrid_Linear_Tree")
         
         if mae < best_mae:
             best_mae = mae
+            best_rmse = rmse
+            best_r2 = r2
             best_model_name = "Structural_Hybrid"
             best_preds = preds
 
     # =========================
     # 5. SAVE WINNER
     # =========================
-    print(f"\n🏆 The Winner is: {best_model_name} (MAE: {best_mae:.2f})")
+    print(f"\n🏆 The Winner is: {best_model_name}")
+    print(f"   MAE:  {best_mae:.2f} EUR")
+    print(f"   RMSE: {best_rmse:.2f} EUR")
+    print(f"   R2:   {best_r2:.3f}")
+    
     print(f"💾 Saving forecast to {OUTPUT_FILE}...")
     
     results = pd.DataFrame({
