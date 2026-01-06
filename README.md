@@ -1,6 +1,6 @@
-**Candidate:** [Your Full Name Here]
-**Email:** [Your Email Address Here]
-**Submission Date:** January 2026
+**Candidate:** GAJULA INDRA KARAN
+**Email:** indrakaran1411@gmail.com
+**Submission Date:** 06 January 2026
 
 ---
 
